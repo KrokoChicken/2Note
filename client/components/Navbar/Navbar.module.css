@@ -1,0 +1,153 @@
+:root {
+  --nav-height: 56px;
+  --radius: 10px;
+  --border: #e5e7eb;
+  --bg: #ffffff;
+  --bg-hover: #f8fafc;
+  --text: #0f172a;
+  --muted: #64748b;
+  --accent: #4f46e5; /* indigo */
+}
+
+/* Sticky shell with subtle shadow */
+.shell {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 0 rgba(17, 24, 39, 0.02);
+}
+
+/* Centered content with max width */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--nav-height);
+
+  padding: 0 16px;
+  gap: 12px;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  color: var(--text);
+  text-decoration: none;
+  padding: 6px 8px;
+  border-radius: calc(var(--radius) - 4px);
+}
+
+.brand:hover {
+  background: var(--bg-hover);
+}
+
+.logoDot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12);
+}
+
+.links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 6px;
+  border-left: 1px solid var(--border);
+}
+
+.link {
+  color: var(--muted);
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: calc(var(--radius) - 4px);
+}
+
+.link:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* User badge */
+.userBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: #fff;
+}
+
+.avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 9999px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+}
+
+.avatarFallback {
+  width: 24px;
+  height: 24px;
+  border-radius: 9999px;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  background: #eef2ff; /* light indigo */
+  border: 1px solid #e0e7ff;
+}
+
+.userName {
+  font-size: 14px;
+  color: var(--text);
+}
+
+/* Primary ghost button */
+.button {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 120ms ease, transform 80ms ease;
+}
+
+.button:hover {
+  background: var(--bg-hover);
+}
+.button:active {
+  transform: translateY(1px);
+}
+
+/* Responsive tweaks */
+@media (max-width: 640px) {
+  .links {
+    display: none;
+  }
+  .userName {
+    display: none;
+  }
+}

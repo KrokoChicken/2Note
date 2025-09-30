@@ -1,0 +1,234 @@
+/* Page background + centering */
+.main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100svh;
+  padding: 24px;
+  background: radial-gradient(
+      1200px 600px at 10% 10%,
+      rgba(99, 102, 241, 0.08),
+      transparent 60%
+    ),
+    radial-gradient(
+      800px 400px at 90% 20%,
+      rgba(16, 185, 129, 0.08),
+      transparent 60%
+    ),
+    #f7f7fb;
+}
+
+/* Card */
+.card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.04), 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+/* Brand row */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.logoDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #6366f1, #22c55e);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+}
+.brandName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #4b5563;
+  letter-spacing: 0.2px;
+}
+
+/* Title */
+.title {
+  margin: 6px 0 18px;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* Alert */
+.alert {
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  border-radius: 10px;
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid rgba(153, 27, 27, 0.2);
+}
+
+/* Google button */
+.googleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  padding: 12px 18px;
+  margin: 0 auto; /* 👈 centers it in the card */
+  min-width: 260px; /* 👈 keeps a nice width */
+  max-width: 100%;
+
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  background: #fff;
+  color: #1f2937;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.googleBtn:hover {
+  border-color: #c7c9cf;
+  box-shadow: 0 2px 6px rgba(60, 64, 67, 0.22),
+    0 2px 8px 1px rgba(60, 64, 67, 0.18);
+}
+.googleBtn:active {
+  transform: translateY(0.5px);
+}
+.googleBtn:disabled {
+  opacity: 0.7;
+  cursor: default;
+  transform: none;
+}
+.googleIcon {
+  display: inline-flex;
+}
+
+/* Progress spinner inside the button */
+.spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  border: 2px solid #e5e7eb;
+  border-top-color: #6366f1;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Divider */
+.divider {
+  margin: 18px 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.line {
+  flex: 1;
+  height: 1px;
+  background: #e5e7eb;
+}
+.or {
+  font-size: 0.8rem;
+  color: #6b7280;
+  user-select: none;
+}
+
+/* Hint text + terms */
+.hint {
+  margin: 8px 0 12px;
+  color: #6b7280;
+  font-size: 0.95rem;
+  text-align: center;
+}
+.terms {
+  margin-top: 8px;
+  font-size: 0.82rem;
+  color: #6b7280;
+  text-align: center;
+}
+.terms a {
+  color: #4f46e5;
+  text-decoration: none;
+}
+.terms a:hover {
+  text-decoration: underline;
+}
+
+/* Focus visibility */
+.googleBtn:focus-visible,
+a:focus-visible {
+  outline: 3px solid rgba(99, 102, 241, 0.35);
+  outline-offset: 2px;
+  border-radius: 12px;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .main {
+    background: radial-gradient(
+        1200px 600px at 10% 10%,
+        rgba(99, 102, 241, 0.12),
+        transparent 60%
+      ),
+      radial-gradient(
+        800px 400px at 90% 20%,
+        rgba(16, 185, 129, 0.12),
+        transparent 60%
+      ),
+      #0b0d11;
+  }
+  .card {
+    background: #0f1218;
+    border-color: #1f2937;
+    box-shadow: none;
+  }
+  .brandName {
+    color: #9aa4b2;
+  }
+  .title {
+    color: #e5e7eb;
+  }
+  .alert {
+    background: #2a0f0f;
+    border-color: rgba(239, 68, 68, 0.35);
+    color: #fecaca;
+  }
+  .googleBtn {
+    background: #0f1218;
+    color: #e5e7eb;
+    border-color: #2b303b;
+    box-shadow: none;
+  }
+  .googleBtn:hover {
+    border-color: #3a4250;
+    box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.12) inset;
+  }
+  .line {
+    background: #2b303b;
+  }
+  .hint,
+  .terms {
+    color: #9aa4b2;
+  }
+  .terms a {
+    color: #a5b4fc;
+  }
+}
+
+/* Small screens */
+@media (max-width: 420px) {
+  .card {
+    padding: 22px;
+    border-radius: 14px;
+  }
+  .title {
+    font-size: 1.4rem;
+  }
+}

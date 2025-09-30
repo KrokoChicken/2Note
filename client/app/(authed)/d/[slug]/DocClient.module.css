@@ -1,0 +1,130 @@
+/* ---- Page container ---- */
+.container {
+  padding: 0 14px;
+}
+
+/* ---- Header ---- */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 12px 0;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.right {
+  display: flex;
+  align-items: center; /* vertical centering */
+}
+
+.backBtn {
+  text-decoration: none;
+  color: #111;
+  border: 1px solid #e5e7eb;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.backBtn:hover {
+  background: #f8fafc;
+}
+
+.titleInput {
+  font-size: 18px;
+  font-weight: 600;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+}
+
+.titleInput:focus {
+  outline: none;
+  border-color: #6366f1;
+  background: #fff;
+}
+
+.saveBadge {
+  font-size: 12px;
+  color: #6b7280;
+  min-width: 42px;
+}
+
+/* ---- Main content row: editor + (optional) sidebar ---- */
+/* Tip: adjust --editor-max to your preferred reading width */
+.contentRow {
+  --editor-max: 860px;
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px; /* editor + sidebar */
+  grid-template-areas: "editor sidebar";
+  gap: 16px;
+  align-items: start;
+  max-width: 1200px; /* limit overall width */
+  margin: 0 auto; /* center horizontally */
+}
+
+/* No-sidebar case: single column track, centered */
+.noSidebar {
+  grid-template-columns: minmax(0, var(--editor-max));
+  grid-template-areas: "editor";
+  justify-content: center; /* centers that single grid track */
+}
+
+.editorCol {
+  grid-area: editor;
+  min-width: 0; /* allow shrinking without overflow */
+}
+
+.editorWrap {
+  margin-top: 0;
+  /* Optional: keep editor content from getting too wide even if parent changes */
+  max-width: 100%;
+}
+
+/* ---- Sidebar ---- */
+.sidebar {
+}
+
+.sidebar :global(.panel) {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+  padding: 12px;
+}
+
+/* ---- Responsive: stack on small screens ---- */
+@media (max-width: 900px) {
+  .contentRow {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "sidebar"
+      "editor"; /* sidebar above editor on mobile */
+    gap: 12px;
+  }
+
+  /* Personal docs: use full width on mobile */
+  .noSidebar {
+    grid-template-columns: 1fr;
+    grid-template-areas: "editor";
+    justify-content: normal;
+  }
+
+  .sidebar {
+    position: static;
+  }
+}
+
+.kickedBanner {
+  background: #fef3c7; /* amber-100 */
+  color: #92400e; /* amber-800 */
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}

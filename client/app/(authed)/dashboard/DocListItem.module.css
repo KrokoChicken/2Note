@@ -1,0 +1,75 @@
+.item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+}
+.item:hover {
+  background: #f9fafb;
+}
+.main {
+  min-width: 0;
+}
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.title {
+  font-weight: 600;
+}
+
+.badgeOwner,
+.badgeShared {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+}
+.badgeOwner {
+  background: #eef2ff;
+  color: #4338ca;
+  border-color: #c7d2fe;
+}
+.badgeShared {
+  background: #ecfeff;
+  color: #0e7490;
+  border-color: #a5f3fc;
+}
+
+.meta {
+  font-size: 12px;
+  color: #6b7280;
+}
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.secondary,
+.danger {
+  appearance: none;
+  font-size: 14px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+}
+.secondary:hover {
+  background: #f8fafc;
+}
+.danger {
+  color: #b91c1c;
+  border-color: #fecaca;
+  background: #fff7f7;
+}
+.danger:hover {
+  background: #fee2e2;
+}

@@ -1,0 +1,157 @@
+.container {
+  display: flex;
+  justify-content: center;
+  background: #f3f4f6;
+  min-height: 100vh;
+  padding: 30px;
+}
+
+.document {
+  background: #ffffff;
+  width: 100%;
+  min-height: 1000px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ProseMirror base */
+:global(.ProseMirror) {
+  outline: none;
+  position: relative;
+}
+
+:global(.ProseMirror p) {
+  margin: 0.75rem 0;
+  line-height: 1.6;
+  font-size: 1.125rem;
+  color: #111827;
+}
+
+:global(.ProseMirror h1) {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 1.5rem 0 1rem;
+}
+
+:global(.ProseMirror h2) {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 1.25rem 0 0.75rem;
+}
+
+:global(.ProseMirror) {
+  contain: paint;
+}
+
+:global(.collaboration-cursor__caret),
+:global(.collaboration-cursor__label) {
+  animation: none;
+  transition: none;
+  z-index: 10;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* Caret */
+:global(.collaboration-cursor__caret) {
+  position: relative;
+  border-left: 2px solid var(--cursor-color, #4f46e5);
+  margin-left: -1px;
+  margin-right: -1px;
+  pointer-events: none;
+
+  /* Subtle blink */
+  animation: cursor-blink 1.2s steps(2, start) infinite;
+}
+
+@keyframes cursor-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Label */
+:global(.collaboration-cursor__label) {
+  position: absolute;
+  top: 1.25rem; /* below instead of above */
+  left: -2px;
+  transform: none;
+
+  font-size: 12px;
+  font-weight: 500;
+  color: #fff;
+  background: var(--cursor-color, #4f46e5);
+
+  padding: 2px 8px;
+  border-radius: 999px; /* pill shape */
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.editorShell[data-ready="0"] {
+  visibility: hidden;
+}
+
+.editorShell[data-ready="1"] {
+  visibility: visible;
+}
+
+/* Badge container sits top-right inside the white doc card */
+.badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 12px;
+  line-height: 1;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #eef2ff; /* default */
+  color: #3730a3; /* default */
+  border: 1px solid rgba(55, 48, 163, 0.15);
+}
+
+.badgeOk {
+  background: #ecfdf5;
+  color: #065f46;
+  border-color: rgba(6, 95, 70, 0.15);
+}
+
+.badgeWarn {
+  background: #fff7ed;
+  color: #9a3412;
+  border-color: rgba(154, 52, 18, 0.15);
+}
+
+.badgeErr {
+  background: #fef2f2;
+  color: #991b1b;
+  border-color: rgba(153, 27, 27, 0.15);
+}
+
+.loading {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.toolbarBar {
+}
+
+.editorArea {
+  flex: 1;
+  padding: 48px; /* padding inside editing area */
+}
+
+.editor {
+  padding-top: 1.5rem; /* space for labels above first line */
+  padding-bottom: 1.5rem; /* space for labels below last line */
+  overflow: hidden; /* ensures labels don't spill out */
+}

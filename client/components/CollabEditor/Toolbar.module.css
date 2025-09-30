@@ -1,0 +1,18 @@
+.toolbar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center; /* centers toolbar items */
+  padding: 8px;
+  background: #fafafa;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.blockSelect {
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  font-weight: 500;
+}

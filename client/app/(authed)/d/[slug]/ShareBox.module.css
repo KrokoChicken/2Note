@@ -1,0 +1,66 @@
+.box {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 10px;
+  background: #fff;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.input,
+.select,
+.button {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #fff;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+}
+
+.select {
+  flex: 0 0 auto;
+}
+
+/* keep button width stable (Sharing… is longer) */
+.button {
+  flex: 0 0 auto;
+  cursor: pointer;
+  min-width: 9ch; /* fits 'Sharing…' */
+}
+
+.button:disabled {
+  opacity: 0.7; /* visual only; dimensions unchanged */
+  cursor: default;
+}
+
+/* Reserve space for message to avoid layout shift */
+.msgContainer {
+  margin-top: 8px;
+  min-height: 1.25rem; /* ~20px; tweak to match line-height */
+  display: flex;
+  align-items: center;
+}
+
+.msg {
+  font-size: 12px;
+  line-height: 1.25rem;
+  white-space: nowrap; /* prevent multi-line growth */
+  color: #374151; /* default color */
+  transition: opacity 120ms ease; /* optional subtle polish */
+  opacity: 1;
+}
+
+.msgSuccess {
+  color: #059669;
+} /* emerald-600 */
+.msgError {
+  color: #b91c1c;
+} /* red-700 */
