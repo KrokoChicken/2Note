@@ -1,41 +1,22 @@
-.container {
+/* ==== Page Layout ==== */
+.page {
+  display: grid;
+  grid-template-columns: 250px 1fr; /* sidebar + content */
+  min-height: calc(100vh - 80px);
+}
+
+.content {
   padding: 24px;
 }
 
+/* ==== Header (top bar above doc list) ==== */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.actions {
-  margin-top: 16px;
-  margin-bottom: 16px;
-}
-
-.docList {
-  padding: 0;
-  list-style: none;
-  margin-top: 24px;
-}
-
-.docItem {
-  padding: 12px 0;
-  border-bottom: 1px solid #eee;
-  cursor: pointer;
-}
-
-.docTitle {
-  font-weight: 600;
-}
-
-.docMeta {
-  font-size: 12px;
-  color: #666;
-}
-
-/* add these to your existing file */
-
+/* ==== Segmented control ==== */
 .segmented {
   display: inline-flex;
   gap: 6px;
@@ -53,19 +34,16 @@
 
   padding: 8px 12px;
   border-radius: 8px;
-
-  /* 👇 keep a border at all times so size never changes */
-  border: 1px solid transparent;
+  border: 1px solid transparent; /* avoid layout shift */
   box-sizing: border-box;
 
   font-weight: 600;
   color: #374151;
   cursor: pointer;
-
-  /* optional: smooth visual change without layout shift */
   transition: background-color 0.15s ease, border-color 0.15s ease,
     color 0.15s ease;
 }
+
 .segment:hover {
   background: #e5e7eb;
 }

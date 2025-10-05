@@ -155,3 +155,24 @@
   padding-bottom: 1.5rem; /* space for labels below last line */
   overflow: hidden; /* ensures labels don't spill out */
 }
+
+/* CollabEditor.module.css (or wherever your .editor lives) */
+
+/* Editor-only styling so users see where a page break will land */
+.editor hr {
+  border: 0;
+  border-top: 2px dashed #c7d2fe;
+  margin: 16px 0;
+  position: relative;
+}
+.editor hr::after {
+  content: "Page break";
+  position: absolute;
+  top: -10px;
+  right: 8px;
+  font-size: 11px;
+  color: #6b7280;
+  background: #fff;
+  padding: 0 6px;
+  line-height: 1;
+}

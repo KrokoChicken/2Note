@@ -17,7 +17,7 @@ export function useCollaborators(
 
   React.useEffect(() => setCollabs(initial), [initial]);
 
-  // Stable setPending that does not depend on state identity
+ 
   const setPending = React.useCallback((id: string, val: boolean) => {
     setPendingIds(prev => {
       const next = new Set(prev);
@@ -26,7 +26,7 @@ export function useCollaborators(
     });
   }, []);
 
-  // Abortable refetch
+
   const abortRef = React.useRef<AbortController | null>(null);
   const refetch = React.useCallback(async () => {
     abortRef.current?.abort();

@@ -1,3 +1,4 @@
+// /app/(dashboard)/page.tsx
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth.config";
@@ -12,10 +13,11 @@ type Doc = {
   id: string;
   slug: string;
   title: string;
-  updated_at: string; // snake_case because DashboardClient expects this
-  updatedAtText: string; // human readable
+  updated_at: string;
+  updatedAtText: string;
   isOwner: boolean;
   mode: "personal" | "shared";
+  folderId?: string | null; // ✅ added
 };
 
 export default async function DashboardPage() {
@@ -23,7 +25,7 @@ export default async function DashboardPage() {
   if (!session?.user?.id) redirect("/login");
   const userId = session.user.id;
 
-  // Use EXISTS to avoid duplicates if multiple collaborator rows exist
+  // ✅ Include folder_id in SELECT so the client can filter by folder
   const { rows } = await db.execute(sql`
     SELECT
       d.id,
@@ -31,6 +33,7 @@ export default async function DashboardPage() {
       d.title,
       d.updated_at,
       d.mode,
+      d.folder_id AS "folderId",
       (d.owner_user_id = ${userId}) AS is_owner
     FROM documents d
     WHERE
@@ -47,7 +50,6 @@ export default async function DashboardPage() {
     ORDER BY d.updated_at DESC
   `);
 
-  // Format dates server-side (Europe/Copenhagen per your environment)
   const formatter = new Intl.DateTimeFormat("en-GB", {
     dateStyle: "medium",
     timeStyle: "short",
@@ -60,10 +62,11 @@ export default async function DashboardPage() {
       id: String(r.id),
       slug: String(r.slug),
       title: String(r.title),
-      updated_at, // matches DashboardClient's expected field
+      updated_at,
       updatedAtText: formatter.format(new Date(updated_at)),
       isOwner: Boolean(r.is_owner),
       mode: r.mode as "personal" | "shared",
+      folderId: r.folderId ?? null, // ✅ add folder id to the returned object
     };
   });
 

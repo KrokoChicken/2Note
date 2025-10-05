@@ -71,6 +71,7 @@ export const documents = pgTable('documents', {
   mode: docMode("mode").notNull().default("shared"),
   updatedAt: timestamp('updated_at').defaultNow().notNull().$onUpdateFn(() => sql`NOW()`),
   content: jsonb("content").default(sql`'{}'::jsonb`),
+  folderId: uuid('folder_id').references(() => folders.id, { onDelete: 'set null' }),
 });
 
 export const collaborators = pgTable(
@@ -122,3 +123,19 @@ export const docSnapshots = pgTable(
   },
   (t) => [index('snapshots_by_updated_at').on(t.updatedAt)]
 );
+
+// --- FOLDERS ---
+export const folders = pgTable('folders', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  ownerUserId: text('owner_user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  name: varchar('name', { length: 80 }).notNull(),
+  parentId: uuid('parent_id').references(() => folders.id, { onDelete: 'set null' }).default(null), // 👈 add this
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull().$onUpdateFn(() => sql`NOW()`),
+}, (t) => [
+  index('folders_by_owner').on(t.ownerUserId),
+  index('folders_by_owner_name').on(t.ownerUserId, t.name),
+  index('folders_by_parent').on(t.parentId),
+]);

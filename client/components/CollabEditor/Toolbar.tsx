@@ -3,6 +3,7 @@
 import React, { useMemo } from "react";
 import { Editor } from "@tiptap/react";
 import styles from "./Toolbar.module.css";
+import { exportHtmlToPdf } from "@/lib/exportToPdf";
 
 type Props = { editor: Editor | null };
 
@@ -44,7 +45,7 @@ export default function SimpleToolbar({ editor }: Props) {
     if (editor.isActive("heading", { level: 2 })) return "h2";
     if (editor.isActive("heading", { level: 3 })) return "h3";
     return "p";
-  }, [editor.state]); // track editor changes
+  }, [editor.state]);
 
   const changeBlock = (v: "p" | "h1" | "h2" | "h3") => {
     const ch = editor.chain().focus();
@@ -55,9 +56,27 @@ export default function SimpleToolbar({ editor }: Props) {
   const canUndo = editor.can().undo();
   const canRedo = editor.can().redo();
 
+  // in your Toolbar component
+  const insertPageBreak = () => {
+    // Insert <hr> and immediately a new empty paragraph, so cursor lands under it
+    editor
+      .chain()
+      .focus()
+      .insertContent([{ type: "horizontalRule" }, { type: "paragraph" }])
+      .run();
+  };
+
+  const onExportPdf = async () => {
+    const html = editor.getHTML();
+    await exportHtmlToPdf(html, {
+      fileName: "note.pdf",
+      format: "a4",
+      marginMm: 12,
+    });
+  };
+
   return (
     <div role="toolbar" aria-label="Editor toolbar" className={styles.toolbar}>
-      {/* Block type */}
       <select
         value={block}
         onChange={(e) =>
@@ -73,7 +92,6 @@ export default function SimpleToolbar({ editor }: Props) {
         <option value="h3">Heading 3</option>
       </select>
 
-      {/* Inline */}
       <TB
         label="B"
         title="Bold (Ctrl/Cmd+B)"
@@ -87,7 +105,6 @@ export default function SimpleToolbar({ editor }: Props) {
         onClick={() => editor.chain().focus().toggleItalic().run()}
       />
 
-      {/* Undo / Redo */}
       <TB
         label="↶"
         title="Undo (Ctrl/Cmd+Z)"
@@ -101,7 +118,6 @@ export default function SimpleToolbar({ editor }: Props) {
         onClick={() => editor.chain().focus().redo().run()}
       />
 
-      {/* Clear */}
       <TB
         label="Clear"
         title="Clear formatting"
@@ -109,6 +125,23 @@ export default function SimpleToolbar({ editor }: Props) {
           editor.chain().focus().unsetAllMarks().clearNodes().run()
         }
       />
+
+      {/* New buttons */}
+      <TB
+        label="Page break"
+        title="Insert page break"
+        onClick={() => {
+          if (!editor) return;
+          editor
+            .chain()
+            .focus()
+            .setHorizontalRule()
+            .insertContent("<p></p>")
+            .run();
+        }}
+      />
+
+      <TB label="Export PDF" title="Export to PDF" onClick={onExportPdf} />
     </div>
   );
 }
