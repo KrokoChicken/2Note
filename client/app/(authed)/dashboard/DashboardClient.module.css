@@ -53,3 +53,10 @@
   border: 1px solid #e5e7eb;
   color: #111827;
 }
+
+.h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}

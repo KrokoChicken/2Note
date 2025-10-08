@@ -15,11 +15,13 @@ export default function DocListItem({
   onOpen,
   onRemoved,
   onRenamed,
+  onMoveRequest,
 }: {
   doc: Doc;
   onOpen: () => void;
   onRemoved: () => void;
   onRenamed?: (newTitle: string) => void;
+  onMoveRequest: () => void; // NEW
 }) {
   const [busy, setBusy] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -111,6 +113,7 @@ export default function DocListItem({
         {menuOpen && (
           <ul className={styles.menu}>
             {doc.isOwner && <li onClick={handleRename}>Rename</li>}
+            <li onClick={onMoveRequest}>Move to…</li>
             <li onClick={doc.isOwner ? handleDelete : handleLeave}>
               {doc.isOwner ? "Delete" : "Remove"}
             </li>

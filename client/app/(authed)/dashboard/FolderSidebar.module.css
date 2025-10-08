@@ -172,3 +172,160 @@
 .kebabMenu button.danger:hover {
   background: #fee2e2;
 }
+
+/* --- Top cluster & workspace toggle --- */
+.sidebarTop {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding-bottom: 8px;
+  background: linear-gradient(#fbfbfe, #fbfbfe 85%, transparent);
+}
+
+.wsToggle {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 6px;
+  padding: 6px;
+  border: 1px solid #e5e7eb;
+  background: #f8fafc;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.wsBtn {
+  appearance: none;
+  border: 1px solid transparent;
+  background: transparent;
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+  transition: background-color 0.15s ease, color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.wsBtn:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.wsActive {
+  background: #ffffff;
+  border-color: #e5e7eb;
+  color: #111827;
+}
+
+.wsIcon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* Small icon before “All documents” and “Unfiled” */
+.sideIcon {
+  display: inline-block;
+  width: 18px;
+  text-align: center;
+  margin-right: 6px;
+}
+
+/* Divider between quick filters and tree */
+.sectionDivider {
+  height: 1px;
+  background: #eef0f3;
+  margin: 8px 0 6px;
+}
+
+/* Tighten tree rows & align kebab better */
+.treeRow {
+  display: grid;
+  grid-template-columns: 20px 1fr auto;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 4px;
+  border-radius: 6px;
+}
+
+.treeRow:hover {
+  background: #f9fafb;
+}
+
+/* Better folder button look in tree */
+.folderBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  padding: 6px 8px;
+  border-radius: 6px;
+  color: #374151;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.folderBtn:hover {
+  background: #eef2ff50;
+  color: #111827;
+}
+
+.folderActive {
+  background: #eef2ff;
+  color: #111827;
+  font-weight: 600;
+}
+
+/* Kebab menu polish */
+.kebabBtn {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: #6b7280;
+  font-size: 16px;
+  padding: 4px 6px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease,
+    border-color 0.15s ease;
+}
+.kebabBtn:hover {
+  background: #f3f4f6;
+  color: #111827;
+  border-color: #e5e7eb;
+}
+.kebabMenu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.08);
+  min-width: 160px;
+  padding: 6px 0;
+  z-index: 20;
+}
+.kebabMenu button {
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #111827;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+.kebabMenu button:hover {
+  background: #f3f4f6;
+}
+.kebabMenu button.danger {
+  color: #dc2626;
+}
+.kebabMenu button.danger:hover {
+  background: #fee2e2;
+}

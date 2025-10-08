@@ -14,10 +14,12 @@ export default function DocList({
   docs,
   onOpen,
   onRemoved,
+  onMoveRequest,
 }: {
   docs: Doc[];
   onOpen: (slug: string) => void;
   onRemoved: (slug: string) => void;
+  onMoveRequest: (slug: string) => void;
 }) {
   if (docs.length === 0) {
     return <div className={styles.empty}>No documents yet. Create one!</div>;
@@ -31,6 +33,7 @@ export default function DocList({
           doc={d}
           onOpen={() => onOpen(d.slug)}
           onRemoved={() => onRemoved(d.slug)}
+          onMoveRequest={() => onMoveRequest(d.slug)}
         />
       ))}
     </ul>

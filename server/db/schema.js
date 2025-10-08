@@ -132,6 +132,7 @@ export const folders = pgTable('folders', {
     .references(() => users.id, { onDelete: 'cascade' }),
   name: varchar('name', { length: 80 }).notNull(),
   parentId: uuid('parent_id').references(() => folders.id, { onDelete: 'set null' }).default(null), // 👈 add this
+  workspace: docMode('workspace').notNull().default('personal'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull().$onUpdateFn(() => sql`NOW()`),
 }, (t) => [

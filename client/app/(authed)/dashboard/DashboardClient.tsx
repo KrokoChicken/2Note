@@ -2,14 +2,16 @@
 "use client";
 
 import * as React from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import styles from "./DashboardClient.module.css";
+
 import NewDocButton from "./NewDocButton";
 import DocList from "./DocList";
-import styles from "./DashboardClient.module.css";
-import FolderSidebar, { type Folder } from "./FolderSidebar";
+import FolderSidebar from "./FolderSidebar";
+import MoveDocModal from "./MoveDocModal";
 
-/* ---------------- Types ---------------- */
-type Mode = "personal" | "shared";
+import { useWorkspaceParam, type Workspace } from "./hooks/useWorkspaceParam";
+import { useWorkspaceFolders } from "./hooks/useWorkspaceFolders";
 
 type Doc = {
   id: string;
@@ -18,14 +20,10 @@ type Doc = {
   updated_at: string;
   updatedAtText: string;
   isOwner: boolean;
-  mode?: Mode;
-  folderId?: string | null;
+  mode?: Workspace; // "personal" | "shared"
+  folderId?: string | null; // null = Unfiled
 };
 
-/* -------------- Helpers ---------------- */
-const tempId = () => `temp_${Math.random().toString(36).slice(2, 10)}`;
-
-/* ------------- Main Dashboard ---------- */
 export default function DashboardClient({
   userName,
   docs: initialDocs,
@@ -34,268 +32,144 @@ export default function DashboardClient({
   docs: Doc[];
 }) {
   const router = useRouter();
-  const params = useSearchParams();
 
-  // Mode tab from URL ?mode=personal|shared
-  const urlMode =
-    (params.get("mode") as Mode) === "shared" ? "shared" : "personal";
-  const [mode, setMode] = React.useState<Mode>(urlMode);
+  // Workspace from ?ws=personal|shared (with setter)
+  const { workspace, setWorkspace } = useWorkspaceParam();
 
+  // Local docs cache
   const [docs, setDocs] = React.useState<Doc[]>(initialDocs);
 
-  // Folder state
-  const [folders, setFolders] = React.useState<Folder[]>([]);
+  // Folder selection (null = All, "__none__" = Unfiled)
   const [activeFolderId, setActiveFolderId] = React.useState<string | null>(
     null
-  ); // null = All, "__none__" = Unfiled
-
-  // Keep URL in sync for mode only (folder selection is local UI state)
-  React.useEffect(() => {
-    const url = new URL(window.location.href);
-    url.searchParams.set("mode", mode);
-    window.history.replaceState({}, "", url);
-  }, [mode]);
-
-  // Fetch folders once
-  React.useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const r = await fetch("/api/folders", { cache: "no-store" });
-        if (!r.ok) throw new Error("Failed to fetch folders");
-        const data = await r.json();
-        if (!cancelled) setFolders(data.folders ?? data ?? []);
-      } catch (e) {
-        console.error(e);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  // Create root folder (optimistic)
-  const onCreateFolder = React.useCallback(async () => {
-    const raw = prompt("Folder name?");
-    const name = (raw ?? "").trim();
-    if (!name) return;
-
-    const tmp: Folder = { id: tempId(), name, parentId: null };
-    setFolders((prev) => [...prev, tmp]);
-    setActiveFolderId(tmp.id);
-
-    try {
-      const r = await fetch("/api/folders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, parentId: null }),
-      });
-      if (!r.ok) throw new Error("Failed to create folder");
-      const payload = await r.json();
-      const created: Folder = payload.folder ?? payload;
-
-      setFolders((prev) =>
-        prev.map((f) =>
-          f.id === tmp.id ? { ...f, id: created.id, name: created.name } : f
-        )
-      );
-      setActiveFolderId(created.id);
-    } catch (e) {
-      console.error(e);
-      setFolders((prev) => prev.filter((f) => f.id !== tmp.id));
-      alert("Could not create folder.");
-    }
-  }, []);
-
-  // Create subfolder (optimistic)
-  const onCreateSubfolder = React.useCallback(async (parentId: string) => {
-    const raw = prompt("Subfolder name?");
-    const name = (raw ?? "").trim();
-    if (!name) return;
-
-    const tmp: Folder = { id: tempId(), name, parentId };
-    setFolders((prev) => [...prev, tmp]);
-    setActiveFolderId(tmp.id);
-
-    try {
-      const r = await fetch("/api/folders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, parentId }),
-      });
-      if (!r.ok) throw new Error("Failed to create subfolder");
-      const payload = await r.json();
-      const created: Folder = payload.folder ?? payload;
-
-      setFolders((prev) =>
-        prev.map((f) => (f.id === tmp.id ? { ...created } : f))
-      );
-      setActiveFolderId(created.id);
-    } catch (e) {
-      console.error(e);
-      setFolders((prev) => prev.filter((f) => f.id !== tmp.id));
-      alert("Could not create subfolder.");
-    }
-  }, []);
-
-  // Rename folder (optimistic)
-  const onRenameFolder = React.useCallback(
-    async (id: string) => {
-      const current = folders.find((f) => f.id === id);
-      if (!current) return;
-      const raw = prompt("New folder name:", current.name || "");
-      const name = (raw ?? "").trim();
-      if (!name || name === current.name) return;
-
-      const prevName = current.name;
-      setFolders((prev) => prev.map((f) => (f.id === id ? { ...f, name } : f)));
-
-      try {
-        const r = await fetch(`/api/folders/${id}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name }),
-        });
-        if (!r.ok) throw new Error("Failed to rename folder");
-      } catch (e) {
-        console.error(e);
-        // rollback
-        setFolders((prev) =>
-          prev.map((f) => (f.id === id ? { ...f, name: prevName } : f))
-        );
-        alert("Could not rename folder.");
-      }
-    },
-    [folders]
   );
 
-  // Delete folder (optimistic + reparent children in UI to match server)
-  const onDeleteFolder = React.useCallback(
-    async (id: string) => {
-      const victim = folders.find((f) => f.id === id);
-      if (!victim) return;
+  // Folders for current workspace (via your hook)
+  const { folders, createFolder, createSubfolder, renameFolder, deleteFolder } =
+    useWorkspaceFolders(workspace);
 
-      if (
-        !confirm(
-          `Delete "${
-            victim.name
-          }"?\nDocuments move to Unfiled and subfolders will be reparented to "${
-            victim.parentId ? "its parent" : "root"
-          }".`
-        )
-      ) {
-        return;
-      }
-
-      const prevFolders = folders;
-      const prevDocs = docs;
-
-      // Optimistic: remove victim, reparent direct children to victim.parentId
-      setFolders((prev) =>
-        prev
-          .filter((f) => f.id !== id)
-          .map((f) =>
-            f.parentId === id ? { ...f, parentId: victim.parentId ?? null } : f
-          )
-      );
-      // Docs in that folder → Unfiled
-      setDocs((d) =>
-        d.map((doc) => (doc.folderId === id ? { ...doc, folderId: null } : doc))
-      );
-      // If deleted folder was selected, jump to its parent (or All)
-      setActiveFolderId((cur) => (cur === id ? victim.parentId ?? null : cur));
-
-      try {
-        const res = await fetch(`/api/folders/${id}`, {
-          method: "DELETE",
-          cache: "no-store",
-        });
-        if (!(res.ok || res.status === 204)) {
-          const msg = await res.text().catch(() => "");
-          throw new Error(`Failed to delete (${res.status}) ${msg}`);
-        }
-      } catch (e) {
-        console.error(e);
-        // rollback
-        setFolders(prevFolders);
-        setDocs(prevDocs);
-        alert("Could not delete folder.");
-      }
-    },
-    [folders, docs]
-  );
-
+  // Open a doc
   const handleOpen = (slug: string) => router.push(`/d/${slug}`);
 
+  // Remove a doc from the list locally (after delete/leave)
   const handleRemoved = React.useCallback((slug?: string) => {
     if (!slug) return;
     setDocs((prev) => prev.filter((d) => d.slug !== slug));
   }, []);
 
-  // Filter by mode & selected folder
-  const filtered = React.useMemo(() => {
-    const byMode =
-      mode === "personal"
-        ? docs.filter((d) => d.mode === "personal")
-        : docs.filter((d) => d.mode === "shared" || d.mode === undefined);
+  // ---- Move to folder modal wiring ----
+  const [moveOpen, setMoveOpen] = React.useState(false);
+  const [movingSlug, setMovingSlug] = React.useState<string | null>(null);
+  const movingDoc = React.useMemo(
+    () => docs.find((d) => d.slug === movingSlug) ?? null,
+    [docs, movingSlug]
+  );
 
-    if (activeFolderId === null) return byMode; // All
-    if (activeFolderId === "__none__") return byMode.filter((d) => !d.folderId);
-    return byMode.filter((d) => d.folderId === activeFolderId);
-  }, [docs, mode, activeFolderId]);
+  const handleMoveRequest = (slug: string) => {
+    setMovingSlug(slug);
+    setMoveOpen(true);
+  };
+
+  const confirmMove = async (folderId: string | null) => {
+    if (!movingDoc) return;
+    const res = await fetch(`/api/docs/${movingDoc.slug}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ folderId }),
+    });
+    if (!res.ok) {
+      throw new Error("Failed to move document");
+    }
+    // optimistic local update
+    setDocs((prev) =>
+      prev.map((d) => (d.slug === movingDoc.slug ? { ...d, folderId } : d))
+    );
+  };
+  // -------------------------------------
+
+  // Filter docs by workspace + active folder
+  const filtered = React.useMemo(() => {
+    const byWs = docs.filter((d) =>
+      workspace === "personal" ? d.mode === "personal" : d.mode === "shared"
+    );
+    if (activeFolderId === null) return byWs; // All
+    if (activeFolderId === "__none__") return byWs.filter((d) => !d.folderId); // Unfiled
+    return byWs.filter((d) => d.folderId === activeFolderId); // Specific folder
+  }, [docs, workspace, activeFolderId]);
+
+  const heading = React.useMemo(() => {
+    if (activeFolderId === null) return "All documents";
+    if (activeFolderId === "__none__") return "Unfiled";
+    const f = folders.find((x) => x.id === activeFolderId);
+    return f?.name ?? "All documents";
+  }, [activeFolderId, folders]);
 
   return (
     <main className={styles.page}>
       <FolderSidebar
-        folders={folders}
+        folders={folders.map(({ id, name, parentId }) => ({
+          id,
+          name,
+          parentId,
+        }))}
         activeFolderId={activeFolderId}
         onSelectFolder={setActiveFolderId}
-        onCreateFolder={onCreateFolder}
-        onCreateSubfolder={onCreateSubfolder} // ✅ now wired
-        onRenameFolder={onRenameFolder}
-        onDeleteFolder={onDeleteFolder}
+        onCreateFolder={async () => {
+          const id = await createFolder();
+          if (id) setActiveFolderId(id);
+        }}
+        onCreateSubfolder={async (parentId) => {
+          const id = await createSubfolder(parentId);
+          if (id) setActiveFolderId(id);
+        }}
+        onRenameFolder={renameFolder}
+        onDeleteFolder={async (id) => {
+          const ok = await deleteFolder(id);
+          if (ok) setActiveFolderId((cur) => (cur === id ? null : cur));
+        }}
+        workspace={workspace}
+        onSwitchWorkspace={(ws) => {
+          setWorkspace(ws);
+          setActiveFolderId(null); // reset selection when switching space
+        }}
       />
 
       <section className={styles.content}>
         <header className={styles.header}>
-          <div
-            className={styles.segmented}
-            role="tablist"
-            aria-label="Docs type"
-          >
-            <button
-              type="button"
-              role="tab"
-              aria-selected={mode === "personal"}
-              className={`${styles.segment} ${
-                mode === "personal" ? styles.segmentActive : ""
-              }`}
-              onClick={() => setMode("personal")}
-            >
-              Personal
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={mode === "shared"}
-              className={`${styles.segment} ${
-                mode === "shared" ? styles.segmentActive : ""
-              }`}
-              onClick={() => setMode("shared")}
-            >
-              Collaborative
-            </button>
-          </div>
+          <h2 className={styles.h2}>{heading}</h2>
+          {/* optional: show workspace as a subtle chip */}
 
-          <NewDocButton mode={mode} />
+          {/* 
+  <span className={styles.subtleChip}>
+    {workspace === "personal" ? "Personal" : "Collaborative"}
+  </span> 
+  */}
+
+          <NewDocButton mode={workspace} />
         </header>
 
         <DocList
           docs={filtered}
           onOpen={handleOpen}
           onRemoved={handleRemoved}
+          // ⬇️ new: let items trigger the move modal
+          onMoveRequest={(slug) => handleMoveRequest(slug)}
         />
       </section>
+
+      {/* Move-to-folder modal */}
+      <MoveDocModal
+        open={moveOpen}
+        onClose={() => setMoveOpen(false)}
+        docTitle={movingDoc?.title ?? ""}
+        currentFolderId={movingDoc?.folderId ?? null}
+        folders={folders.map(({ id, name, parentId }) => ({
+          id,
+          name,
+          parentId,
+        }))}
+        onConfirm={confirmMove}
+      />
     </main>
   );
 }

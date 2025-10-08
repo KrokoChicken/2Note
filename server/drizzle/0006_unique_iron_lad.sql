@@ -1,0 +1,1 @@
+ALTER TABLE "folders" ADD COLUMN "workspace" "doc_mode" DEFAULT 'personal' NOT NULL;

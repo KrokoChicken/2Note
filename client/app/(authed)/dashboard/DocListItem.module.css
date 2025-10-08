@@ -73,3 +73,10 @@
 .danger:hover {
   background: #fee2e2;
 }
+
+.listRow {
+  cursor: grab;
+}
+.listRow:active {
+  cursor: grabbing;
+}

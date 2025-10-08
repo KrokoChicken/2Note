@@ -1,0 +1,151 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.5);
+  display: grid;
+  place-items: center;
+  z-index: 40;
+}
+
+.modal {
+  width: 520px;
+  max-height: 70vh;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.closeBtn {
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  color: #6b7280;
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 4px 6px;
+}
+.closeBtn:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.search {
+  margin: 10px 12px 6px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  outline: none;
+  font-size: 14px;
+}
+.search:focus {
+  border-color: #c7d2fe;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.unfiledRow {
+  padding: 4px 12px 8px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.tree {
+  padding: 8px 8px 0;
+  overflow: auto;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+
+.chevBtn {
+  background: none;
+  border: none;
+  padding: 0 4px;
+  cursor: pointer;
+  color: #6b7280;
+}
+.chev {
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+.chevOpen {
+  transform: rotate(90deg);
+}
+.chevHidden {
+  visibility: hidden;
+}
+
+.folderOption {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: #111827;
+  font-size: 14px;
+}
+.folderOption input {
+  margin: 0;
+}
+.folderIcon {
+  width: 18px;
+  display: inline-block;
+  text-align: center;
+}
+
+.footer {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  padding: 12px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.primaryBtn,
+.secondaryBtn {
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-weight: 600;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+.secondaryBtn {
+  background: #fff;
+  border-color: #e5e7eb;
+}
+.secondaryBtn:hover {
+  background: #f9fafb;
+}
+.primaryBtn {
+  background: #4f46e5;
+  color: #fff;
+}
+.primaryBtn:hover {
+  background: #4338ca;
+}
+.primaryBtn:disabled,
+.secondaryBtn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

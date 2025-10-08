@@ -1,4 +1,3 @@
-// /app/(dashboard)/FolderSidebar.tsx
 "use client";
 
 import * as React from "react";
@@ -10,6 +9,8 @@ export type Folder = {
   parentId: string | null;
 };
 
+type Workspace = "personal" | "shared";
+
 type Props = {
   folders: Folder[];
   activeFolderId: string | null; // null = All, "__none__" = Unfiled
@@ -18,6 +19,10 @@ type Props = {
   onCreateSubfolder?: (parentId: string) => void;
   onRenameFolder: (id: string) => void;
   onDeleteFolder: (id: string) => void;
+
+  // NEW: workspace switch lives here
+  workspace: Workspace;
+  onSwitchWorkspace: (ws: Workspace) => void;
 };
 
 export default function FolderSidebar({
@@ -28,22 +33,24 @@ export default function FolderSidebar({
   onCreateSubfolder,
   onRenameFolder,
   onDeleteFolder,
+  workspace,
+  onSwitchWorkspace,
 }: Props) {
   const [open, setOpen] = React.useState<Set<string>>(() => new Set());
   const [menuOpenId, setMenuOpenId] = React.useState<string | null>(null);
 
-  // Close any open kebab on OUTSIDE click (not mousedown) and ignore clicks inside a kebabWrap.
+  // Close kebab when clicking outside the menu
   React.useEffect(() => {
     const onDocClick = (e: MouseEvent) => {
-      const target = e.target as Element | null;
-      if (target && target.closest(`.${styles.kebabWrap}`)) return; // click was inside menu
+      const el = e.target as Element | null;
+      if (el && el.closest(`.${styles.kebabWrap}`)) return;
       setMenuOpenId(null);
     };
     document.addEventListener("click", onDocClick);
     return () => document.removeEventListener("click", onDocClick);
   }, []);
 
-  // Build parentId -> children map (sorted)
+  // Build parent -> children map
   const byParent = React.useMemo(() => {
     const map = new Map<string | null, Folder[]>();
     for (const f of folders) {
@@ -98,7 +105,6 @@ export default function FolderSidebar({
           📁 {f.name || "New folder"}
         </button>
 
-        {/* Prevent outside-closer from firing before item onClick */}
         <div
           className={styles.kebabWrap}
           onMouseDown={(e) => e.stopPropagation()}
@@ -114,7 +120,6 @@ export default function FolderSidebar({
           >
             ⋮
           </button>
-
           {menuOpenId === f.id && (
             <ul role="menu" className={styles.kebabMenu}>
               <li role="menuitem">
@@ -128,7 +133,6 @@ export default function FolderSidebar({
                   Rename
                 </button>
               </li>
-
               <li role="menuitem">
                 <button
                   type="button"
@@ -142,7 +146,6 @@ export default function FolderSidebar({
                   New subfolder
                 </button>
               </li>
-
               <li role="menuitem">
                 <button
                   type="button"
@@ -175,17 +178,47 @@ export default function FolderSidebar({
 
   return (
     <aside className={styles.sidebar}>
-      <div className={styles.sidebarHeader}>
-        <div className={styles.sidebarTitle}>Folders</div>
-        <button
-          className={styles.sidebarNewBtn}
-          onClick={onCreateFolder}
-          type="button"
-        >
-          + New
-        </button>
+      <div className={styles.sidebarTop}>
+        <div className={styles.wsToggle} role="tablist" aria-label="Workspace">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={workspace === "personal"}
+            className={`${styles.wsBtn} ${
+              workspace === "personal" ? styles.wsActive : ""
+            }`}
+            onClick={() => onSwitchWorkspace("personal")}
+            title="Personal workspace"
+          >
+            <span className={styles.wsIcon}>🏠</span> Personal
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={workspace === "shared"}
+            className={`${styles.wsBtn} ${
+              workspace === "shared" ? styles.wsActive : ""
+            }`}
+            onClick={() => onSwitchWorkspace("shared")}
+            title="Collaborative workspace"
+          >
+            <span className={styles.wsIcon}>👥</span> Collab
+          </button>
+        </div>
+
+        <div className={styles.sidebarHeader}>
+          <div className={styles.sidebarTitle}>Folders</div>
+          <button
+            className={styles.sidebarNewBtn}
+            onClick={onCreateFolder}
+            type="button"
+          >
+            + New
+          </button>
+        </div>
       </div>
 
+      {}
       <nav className={styles.folderNav}>
         <button
           type="button"
@@ -195,7 +228,7 @@ export default function FolderSidebar({
           onClick={() => onSelectFolder(null)}
           title="Show all documents"
         >
-          All documents
+          <span className={styles.sideIcon}>📄</span> All documents
         </button>
 
         <button
@@ -206,8 +239,10 @@ export default function FolderSidebar({
           onClick={() => onSelectFolder("__none__")}
           title="Documents with no folder"
         >
-          Unfiled
+          <span className={styles.sideIcon}>🗂️</span> Unfiled
         </button>
+
+        <div className={styles.sectionDivider} />
 
         <div className={styles.folderTree}>{renderTree(null, 0)}</div>
       </nav>
