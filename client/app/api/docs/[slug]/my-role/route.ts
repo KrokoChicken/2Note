@@ -11,14 +11,15 @@ type Mode = "personal" | "shared";
 
 export async function GET(
   _req: Request,
-  { params }: { params: { slug: string } }
+  ctx: { params: Promise<{ slug: string }> } // 👈 note Promise here
 ) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const userId = session.user.id;
-  const { slug } = params;
+
+  const { slug } = await ctx.params; // 👈 await params
 
   // Load doc (id, owner, mode)
   const { rows: docRows } = await db.execute(sql`
@@ -36,7 +37,6 @@ export async function GET(
     mode: Mode | null;
   };
 
-  // Owner is always "owner"
   if (doc.owner_user_id === userId) {
     return NextResponse.json(
       { role: "owner" as const },
@@ -44,7 +44,6 @@ export async function GET(
     );
   }
 
-  // Shared docs: look up collaborator role
   if ((doc.mode ?? "shared") === "shared") {
     const { rows: collabRows } = await db.execute(sql`
       SELECT role
@@ -60,7 +59,6 @@ export async function GET(
     }
   }
 
-  // Not owner and not a collaborator anymore -> tell client to eject
   return NextResponse.json(
     { role: "none" as const },
     { headers: { "Cache-Control": "no-store" } }

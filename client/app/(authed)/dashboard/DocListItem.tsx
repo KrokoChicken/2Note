@@ -1,6 +1,7 @@
+// /app/(dashboard)/DocListItem.tsx
 "use client";
 
-import { useState } from "react";
+import * as React from "react";
 import styles from "./DocListItem.module.css";
 
 type Doc = {
@@ -8,6 +9,7 @@ type Doc = {
   title: string;
   updatedAtText: string;
   isOwner: boolean;
+  folderName?: string | null; // 👈 NEW
 };
 
 export default function DocListItem({
@@ -16,19 +18,51 @@ export default function DocListItem({
   onRemoved,
   onRenamed,
   onMoveRequest,
+  showFolderName = false, // 👈 NEW: show folder chip when true
 }: {
   doc: Doc;
   onOpen: () => void;
   onRemoved: () => void;
   onRenamed?: (newTitle: string) => void;
-  onMoveRequest: () => void; // NEW
+  onMoveRequest: () => void;
+  showFolderName?: boolean;
 }) {
-  const [busy, setBusy] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [busy, setBusy] = React.useState(false);
+  const [menuOpen, setMenuOpen] = React.useState(false);
 
-  const toggleMenu = (e: React.MouseEvent) => {
+  const btnRef = React.useRef<HTMLButtonElement | null>(null);
+  const menuRef = React.useRef<HTMLDivElement | null>(null);
+
+  // Close on outside click / Esc
+  React.useEffect(() => {
+    if (!menuOpen) return;
+    const onDocClick = (e: MouseEvent) => {
+      const t = e.target as Node;
+      if (menuRef.current?.contains(t) || btnRef.current?.contains(t)) return;
+      setMenuOpen(false);
+    };
+    const onEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMenuOpen(false);
+    };
+    document.addEventListener("mousedown", onDocClick);
+    document.addEventListener("keydown", onEsc);
+    return () => {
+      document.removeEventListener("mousedown", onDocClick);
+      document.removeEventListener("keydown", onEsc);
+    };
+  }, [menuOpen]);
+
+  // Focus first menu item on open
+  React.useEffect(() => {
+    if (!menuOpen) return;
+    menuRef.current
+      ?.querySelector<HTMLButtonElement>("[data-menuitem]")
+      ?.focus();
+  }, [menuOpen]);
+
+  const openMenu = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setMenuOpen((prev) => !prev);
+    setMenuOpen((p) => !p);
   };
 
   const handleDelete = async () => {
@@ -88,6 +122,40 @@ export default function DocListItem({
     }
   };
 
+  // Keyboard nav inside menu
+  const onMenuKeyDown = (e: React.KeyboardEvent) => {
+    const items = Array.from(
+      menuRef.current?.querySelectorAll<HTMLButtonElement>("[data-menuitem]") ??
+        []
+    );
+    const idx = items.findIndex((el) => el === document.activeElement);
+    const move = (i: number) => items[i]?.focus();
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        move(idx < items.length - 1 ? idx + 1 : 0);
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        move(idx > 0 ? idx - 1 : items.length - 1);
+        break;
+      case "Home":
+        e.preventDefault();
+        move(0);
+        break;
+      case "End":
+        e.preventDefault();
+        move(items.length - 1);
+        break;
+      case "Tab":
+        e.preventDefault(); // trap focus
+        if (e.shiftKey) move(idx > 0 ? idx - 1 : items.length - 1);
+        else move(idx < items.length - 1 ? idx + 1 : 0);
+        break;
+    }
+  };
+
   return (
     <li className={styles.item} onClick={onOpen} aria-busy={busy}>
       <div className={styles.main}>
@@ -99,25 +167,75 @@ export default function DocListItem({
             {doc.isOwner ? "Owner" : "Shared"}
           </span>
         </div>
-        <div className={styles.meta}>Updated {doc.updatedAtText}</div>
+
+        <div className={styles.metaRow}>
+          <div className={styles.meta}>Updated {doc.updatedAtText}</div>
+          {showFolderName && !!doc.folderName && (
+            <span className={styles.folderChip} title={doc.folderName}>
+              📁 {doc.folderName}
+            </span>
+          )}
+        </div>
       </div>
 
       <div className={styles.actions} onClick={(e) => e.stopPropagation()}>
         <button
-          className={styles.menuButton}
-          onClick={toggleMenu}
+          ref={btnRef}
+          className={styles.kebabBtn}
+          onClick={openMenu}
+          aria-haspopup="menu"
           aria-expanded={menuOpen}
+          aria-controls={`menu-${doc.slug}`}
+          title="More actions"
         >
-          ⋮
+          ⋯
         </button>
+
         {menuOpen && (
-          <ul className={styles.menu}>
-            {doc.isOwner && <li onClick={handleRename}>Rename</li>}
-            <li onClick={onMoveRequest}>Move to…</li>
-            <li onClick={doc.isOwner ? handleDelete : handleLeave}>
-              {doc.isOwner ? "Delete" : "Remove"}
-            </li>
-          </ul>
+          <div
+            id={`menu-${doc.slug}`}
+            ref={menuRef}
+            className={styles.menu}
+            role="menu"
+            aria-labelledby={`btn-${doc.slug}`}
+            onKeyDown={onMenuKeyDown}
+          >
+            <div className={styles.menuArrow} aria-hidden />
+            {doc.isOwner && (
+              <button
+                data-menuitem
+                role="menuitem"
+                className={styles.menuItem}
+                onClick={handleRename}
+              >
+                ✏️ Rename
+              </button>
+            )}
+
+            <button
+              data-menuitem
+              role="menuitem"
+              className={styles.menuItem}
+              onClick={() => {
+                setMenuOpen(false);
+                onMoveRequest();
+              }}
+            >
+              📁 Move to…
+            </button>
+
+            <div className={styles.menuDivider} />
+
+            <button
+              data-menuitem
+              role="menuitem"
+              className={`${styles.menuItem} ${styles.danger}`}
+              onClick={doc.isOwner ? handleDelete : handleLeave}
+              disabled={busy}
+            >
+              {doc.isOwner ? "🗑 Delete" : "➖ Remove"}
+            </button>
+          </div>
         )}
       </div>
     </li>

@@ -1,4 +1,4 @@
-// /app/d/[slug]/page.tsx
+// /app/(authed)/d/[slug]/page.tsx
 import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth.config";
@@ -10,13 +10,15 @@ import type { DocumentRow, CollaboratorRole } from "@/lib/types/docs";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-type Props = { params: { slug: string } };
+// 👇 params is a Promise now
+type Props = { params: Promise<{ slug: string }> };
 
 export default async function DocPage({ params }: Props) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) notFound();
   const userId = session.user.id;
-  const slug = params.slug;
+
+  const { slug } = await params; // 👈 await it
 
   // Fetch doc (explicit aliases + debug db name)
   const { rows } = await db.execute(sql`
@@ -37,8 +39,6 @@ export default async function DocPage({ params }: Props) {
   if (rows.length === 0) notFound();
 
   const row = rows[0] as DocumentRow & { dbName?: string };
-  console.log("[DocPage] row from DB:", row);
-
   const mode = (row.mode ?? "shared") as "personal" | "shared";
   const isOwner = row.ownerUserId === userId;
 
@@ -55,23 +55,19 @@ export default async function DocPage({ params }: Props) {
     if (!isOwner) notFound();
   }
 
-  // ---- Normalize content for client serialization ----
-  // Force plain JSON so Next.js can serialize it (handles JSONB wrappers).
+  // Normalize content for client serialization
   let initialContent: unknown | null = row.content ?? null;
   try {
     initialContent = JSON.parse(JSON.stringify(initialContent));
   } catch {
     initialContent = null;
   }
-  // If it came back as a JSON-looking string, parse it once more.
   if (typeof initialContent === "string") {
     const s = initialContent.trim();
     if (s.startsWith("{") || s.startsWith("[")) {
       try {
         initialContent = JSON.parse(s);
-      } catch {
-        /* leave as string; editor will treat as HTML */
-      }
+      } catch {}
     }
   }
 
@@ -123,7 +119,7 @@ export default async function DocPage({ params }: Props) {
       mode={mode}
       currentUserId={userId}
       collaborators={collaborators ?? []}
-      initialContent={initialContent} // ✅ always plain JSON / string / null
+      initialContent={initialContent}
     />
   );
 }

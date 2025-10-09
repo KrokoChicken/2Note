@@ -52,31 +52,121 @@
   gap: 8px;
 }
 
-.secondary,
-.danger {
+/* Kebab button */
+.kebabBtn {
   appearance: none;
-  font-size: 14px;
-  padding: 6px 10px;
+  border: 1px solid transparent;
+  background: transparent;
   border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 18px;
+  line-height: 1;
   cursor: pointer;
-  border: 1px solid #e5e7eb;
+  color: #6b7280;
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+    color 0.15s ease;
+}
+.kebabBtn:hover {
+  background: #f3f4f6;
+  color: #111827;
+  border-color: #e5e7eb;
+}
+.kebabBtn:focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+}
+
+/* Popover menu */
+.menu {
+  position: absolute;
+  right: 8px;
+  top: calc(100% + 8px);
+  min-width: 180px;
   background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+  padding: 6px;
+  z-index: 20;
+
+  display: flex;
+  flex-direction: column;
 }
-.secondary:hover {
-  background: #f8fafc;
+.actions {
+  position: relative;
+} /* parent for absolute menu */
+
+/* little arrow */
+.menuArrow {
+  position: absolute;
+  top: -6px;
+  right: 14px;
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border-left: 1px solid #e5e7eb;
+  border-top: 1px solid #e5e7eb;
+  transform: rotate(45deg);
 }
-.danger {
-  color: #b91c1c;
-  border-color: #fecaca;
-  background: #fff7f7;
+
+.menuItem {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #111827;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
-.danger:hover {
+.menuItem:hover,
+.menuItem:focus-visible {
+  background: #f3f4f6;
+  outline: none;
+}
+.menuItem:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.menuDivider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 6px 4px;
+}
+
+.menuItem.danger {
+  color: #dc2626;
+}
+.menuItem.danger:hover,
+.menuItem.danger:focus-visible {
   background: #fee2e2;
 }
 
-.listRow {
-  cursor: grab;
+/* (Keep your existing .item, .main, .titleRow, .title, .badgeOwner/.badgeShared, .meta, .actions) */
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-height: 1.5em; /* ✅ ensures consistent height even if no folder chip */
+  margin-top: 2px; /* optional, keeps spacing consistent below title */
 }
-.listRow:active {
-  cursor: grabbing;
+
+.folderChip {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  color: #374151;
+  line-height: 1.4;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  height: 1.4em; /* ✅ keeps chip same height as text line */
 }

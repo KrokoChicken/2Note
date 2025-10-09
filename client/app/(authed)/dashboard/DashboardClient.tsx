@@ -154,6 +154,7 @@ export default function DashboardClient({
           onRemoved={handleRemoved}
           // ⬇️ new: let items trigger the move modal
           onMoveRequest={(slug) => handleMoveRequest(slug)}
+          showFolderName={activeFolderId === null} // 👈 only show when in "All Documents"
         />
       </section>
 

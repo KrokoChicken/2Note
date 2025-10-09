@@ -15,11 +15,13 @@ export default function DocList({
   onOpen,
   onRemoved,
   onMoveRequest,
+  showFolderName = false,
 }: {
   docs: Doc[];
   onOpen: (slug: string) => void;
   onRemoved: (slug: string) => void;
   onMoveRequest: (slug: string) => void;
+  showFolderName?: boolean; // 👈 add this
 }) {
   if (docs.length === 0) {
     return <div className={styles.empty}>No documents yet. Create one!</div>;
@@ -34,6 +36,7 @@ export default function DocList({
           onOpen={() => onOpen(d.slug)}
           onRemoved={() => onRemoved(d.slug)}
           onMoveRequest={() => onMoveRequest(d.slug)}
+          showFolderName={showFolderName} // 👈 pass it down
         />
       ))}
     </ul>
