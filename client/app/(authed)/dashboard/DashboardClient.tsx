@@ -44,7 +44,7 @@ export default function DashboardClient({
     null
   );
 
-  // Folders for current workspace (via your hook)
+  // Folders for current workspace
   const { folders, createFolder, createSubfolder, renameFolder, deleteFolder } =
     useWorkspaceFolders(workspace);
 
@@ -97,6 +97,7 @@ export default function DashboardClient({
     return byWs.filter((d) => d.folderId === activeFolderId); // Specific folder
   }, [docs, workspace, activeFolderId]);
 
+  // Heading text (All / Unfiled / Folder name)
   const heading = React.useMemo(() => {
     if (activeFolderId === null) return "All documents";
     if (activeFolderId === "__none__") return "Unfiled";
@@ -137,14 +138,12 @@ export default function DashboardClient({
       <section className={styles.content}>
         <header className={styles.header}>
           <h2 className={styles.h2}>{heading}</h2>
-          {/* optional: show workspace as a subtle chip */}
 
-          {/* 
-  <span className={styles.subtleChip}>
-    {workspace === "personal" ? "Personal" : "Collaborative"}
-  </span> 
-  */}
-
+          {/* If you want a small workspace chip, uncomment:
+          <span className={styles.subtleChip}>
+            {workspace === "personal" ? "Personal" : "Collaborative"}
+          </span>
+          */}
           <NewDocButton mode={workspace} />
         </header>
 
@@ -152,9 +151,9 @@ export default function DashboardClient({
           docs={filtered}
           onOpen={handleOpen}
           onRemoved={handleRemoved}
-          // ⬇️ new: let items trigger the move modal
           onMoveRequest={(slug) => handleMoveRequest(slug)}
-          showFolderName={activeFolderId === null} // 👈 only show when in "All Documents"
+          showFolderName={activeFolderId === null} // show folder chip only in "All documents"
+          workspace={workspace} // lets DocList decide e.g. to show role badge only in shared
         />
       </section>
 

@@ -9,19 +9,21 @@ type Doc = {
   updatedAtText: string;
   isOwner: boolean;
 };
-
+type Workspace = "personal" | "shared";
 export default function DocList({
   docs,
   onOpen,
   onRemoved,
   onMoveRequest,
   showFolderName = false,
+  workspace,
 }: {
   docs: Doc[];
   onOpen: (slug: string) => void;
   onRemoved: (slug: string) => void;
   onMoveRequest: (slug: string) => void;
   showFolderName?: boolean; // 👈 add this
+  workspace: Workspace;
 }) {
   if (docs.length === 0) {
     return <div className={styles.empty}>No documents yet. Create one!</div>;
@@ -37,6 +39,7 @@ export default function DocList({
           onRemoved={() => onRemoved(d.slug)}
           onMoveRequest={() => onMoveRequest(d.slug)}
           showFolderName={showFolderName} // 👈 pass it down
+          showRoleBadge={workspace === "shared"}
         />
       ))}
     </ul>

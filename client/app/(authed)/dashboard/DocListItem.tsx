@@ -1,4 +1,3 @@
-// /app/(dashboard)/DocListItem.tsx
 "use client";
 
 import * as React from "react";
@@ -9,7 +8,7 @@ type Doc = {
   title: string;
   updatedAtText: string;
   isOwner: boolean;
-  folderName?: string | null; // 👈 NEW
+  folderName?: string | null;
 };
 
 export default function DocListItem({
@@ -18,7 +17,8 @@ export default function DocListItem({
   onRemoved,
   onRenamed,
   onMoveRequest,
-  showFolderName = false, // 👈 NEW: show folder chip when true
+  showFolderName = false,
+  showRoleBadge = true, // 👈 NEW: control Owner/Shared chip
 }: {
   doc: Doc;
   onOpen: () => void;
@@ -26,6 +26,7 @@ export default function DocListItem({
   onRenamed?: (newTitle: string) => void;
   onMoveRequest: () => void;
   showFolderName?: boolean;
+  showRoleBadge?: boolean; // 👈 NEW
 }) {
   const [busy, setBusy] = React.useState(false);
   const [menuOpen, setMenuOpen] = React.useState(false);
@@ -33,7 +34,6 @@ export default function DocListItem({
   const btnRef = React.useRef<HTMLButtonElement | null>(null);
   const menuRef = React.useRef<HTMLDivElement | null>(null);
 
-  // Close on outside click / Esc
   React.useEffect(() => {
     if (!menuOpen) return;
     const onDocClick = (e: MouseEvent) => {
@@ -52,7 +52,6 @@ export default function DocListItem({
     };
   }, [menuOpen]);
 
-  // Focus first menu item on open
   React.useEffect(() => {
     if (!menuOpen) return;
     menuRef.current
@@ -122,7 +121,6 @@ export default function DocListItem({
     }
   };
 
-  // Keyboard nav inside menu
   const onMenuKeyDown = (e: React.KeyboardEvent) => {
     const items = Array.from(
       menuRef.current?.querySelectorAll<HTMLButtonElement>("[data-menuitem]") ??
@@ -149,7 +147,7 @@ export default function DocListItem({
         move(items.length - 1);
         break;
       case "Tab":
-        e.preventDefault(); // trap focus
+        e.preventDefault();
         if (e.shiftKey) move(idx > 0 ? idx - 1 : items.length - 1);
         else move(idx < items.length - 1 ? idx + 1 : 0);
         break;
@@ -161,11 +159,13 @@ export default function DocListItem({
       <div className={styles.main}>
         <div className={styles.titleRow}>
           <span className={styles.title}>{doc.title}</span>
-          <span
-            className={doc.isOwner ? styles.badgeOwner : styles.badgeShared}
-          >
-            {doc.isOwner ? "Owner" : "Shared"}
-          </span>
+          {showRoleBadge && (
+            <span
+              className={doc.isOwner ? styles.badgeOwner : styles.badgeShared}
+            >
+              {doc.isOwner ? "Owner" : "Shared"}
+            </span>
+          )}
         </div>
 
         <div className={styles.metaRow}>
